@@ -3,6 +3,8 @@ import os
 import smtplib
 from dotenv import load_dotenv
 from gettygo import gettygo_scrap
+from tyre24 import scrap_tyre24
+from centralepneus import scrap_centralepneus
 from email.mime.text import MIMEText
 from carleader import carleader_scrap
 from districash import districash_scrap
@@ -57,6 +59,20 @@ except Exception as ex:
     send_email("Erreur scrap web", error_message)
 try:
     gettygo_scrap(liste_articles, saisons, marques)
+    time.sleep(20)
+except Exception as ex:
+    error_message = str(ex)
+    print(error_message)
+    send_email("Erreur scrap web", error_message)
+try:
+    scrap_tyre24(liste_articles, saisons, marques)
+    time.sleep(20)
+except Exception as ex:
+    error_message = str(ex)
+    print(error_message)
+    send_email("Erreur scrap web", error_message)
+try:
+    scrap_centralepneus(liste_articles, saisons, marques)
     time.sleep(20)
 except Exception as ex:
     error_message = str(ex)

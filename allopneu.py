@@ -77,27 +77,28 @@ def select_saison(driver, saisons):
 def select_charge_vitesse(driver, liste_article):
     try:
         driver.find_element(By.ID, 'tire_search_load').click()
-        time.sleep(2)
+        time.sleep(4)
         if len(liste_article) == 10:
             driver.find_element(
                 By.XPATH, f'//label[@for="load_{liste_article[8:10]}"]').click()
-            time.sleep(3)
+            time.sleep(4)
         else:
             driver.find_element(
                 By.XPATH, f'//label[@for="load_{liste_article[8:11]}"]').click()
-            time.sleep(3)
+            time.sleep(4)
         driver.find_element(
             By.XPATH, f'//label[@for="speed_{liste_article[7:8]}"]').click()
-        time.sleep(1)
+        time.sleep(4)
         driver.find_element(
             By.XPATH, '//*[@id="app_product_search_form_by_dimension_root"]/div[3]/div/div[5]/button').click()
+        time.sleep(5)
 
     except Exception as ex:
         print(ex)
         pass
 
 
-def gettygo_scrap(liste_articles, saison, marques):
+def gettygo_scrap(liste_articles, saisons, marques):
     driver = webdriver.Firefox('')
 
     driver.get(
@@ -123,23 +124,35 @@ def gettygo_scrap(liste_articles, saison, marques):
             time.sleep(3)
             select_saison(driver, saisons)
             select_charge_vitesse(driver, liste_article)
+            driver.find_element(
+                By.XPATH, '//*[@id="accordion__panel-brand"]/button').click()
+            time.sleep(2)
+
+            for i in marques:
+                print(i)
+                try:
+                    driver.find_element(
+                        By.ID, f'//label[@for="{i.lower()}"]').click()
+                    time.sleep(3)
+                except:
+                    pass
 
             articles = driver.find_elements(By.CLASS_NAME, 'listing-row')
 
-            for article in articles:
-                pass
+            # for article in articles:
+            #     pass
 
-            try:
-                while True:
-                    driver.find_element(
-                        By.XPATH, '//*[@id="js-listing-container"]/ul/li[8]/a').click()
-                    time.sleep(5)
-                    articles = driver.find_elements(
-                        By.CLASS_NAME, 'listing-row')
-                    for article in articles:
-                        pass
-            except:
-                pass
+            # try:
+            #     while True:
+            #         driver.find_element(
+            #             By.XPATH, '//*[@id="js-listing-container"]/ul/li[8]/a').click()
+            #         time.sleep(5)
+            #         articles = driver.find_elements(
+            #             By.CLASS_NAME, 'listing-row')
+            #         for article in articles:
+            #             pass
+            # except:
+            #     pass
 
         except Exception as ex:
             print('pas bon')

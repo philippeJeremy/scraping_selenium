@@ -186,7 +186,9 @@ def scrap_tyre24(liste_articles, saisons, marques):
             article_info = extract_article_info(article, driver, liste_article)
             data.append(article_info)
 
-    save_donnees_sql(data)
+    save_donnees_sql(data, marques)
+
+    driver.quit()
 
 
 if __name__ == "__main__":

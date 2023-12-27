@@ -1,13 +1,13 @@
-import time
 import os
+import time
 import smtplib
 from dotenv import load_dotenv
-from gettygo import gettygo_scrap
 from tyre24 import scrap_tyre24
-from centralepneus import scrap_centralepneus
+from gettygo import gettygo_scrap
 from email.mime.text import MIMEText
 from carleader import carleader_scrap
 from districash import districash_scrap
+from centralepneus import scrap_centralepneus
 from email.mime.multipart import MIMEMultipart
 
 # dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
@@ -25,7 +25,7 @@ marques = ["Michelin", "Continental", "Bridgestone",  'Dunlop',  'Goodyear',
 # mail si erreur lors de l'éxecution
 
 
-def send_email(subject, content):
+def send_email(subject, content) -> None:
     sender_email = os.getenv("SENDMAIL")
     sender_password = os.getenv("PWDMAIL")
     receiver_email = os.getenv("RECMAIL")
@@ -43,6 +43,7 @@ def send_email(subject, content):
         server.sendmail(sender_email, receiver_email, message.as_string())
 
 
+# lancement de scraping sur chaque site 1 pas 1 avec envoie de mail si erreur lors de l'execution
 try:
     carleader_scrap(liste_articles, saisons, marques)
     time.sleep(20)

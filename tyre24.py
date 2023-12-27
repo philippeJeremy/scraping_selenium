@@ -1,14 +1,15 @@
 import os
-import time
 import re
+import time
 import pandas as pd
 from datetime import datetime
 from selenium import webdriver
-from sqlalchemy import create_engine
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
+# lecture d'un fichier excel et mise des donées en tableau
 dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
 liste_articles = dimension['Dimension'].to_list()
 # liste_articles = ["2055516V91"]
@@ -17,6 +18,7 @@ saisons = ["été", "4 saisons"]
 
 marques = ["Michelin", "Continental", "Bridgestone",  'Dunlop',  'Goodyear',
            'Kleber', 'Firestone', 'Vredestein', "Hankook", 'Uniroyal', 'Kormoran', 'Tourador']
+
 
 load_dotenv()
 
@@ -29,20 +31,31 @@ def scroll_to_bottom(driver):
 
 
 def login(driver):
+    """
+    fonction qui refuse les cookies et qui remplie les champs login et password et valide 
+
+    """
     driver.find_element(
         By.XPATH, '//*[@id="alzura-cookie-consent"]/div/div/div/div[2]/a[1]').click()
     time.sleep(2)
+
     login = driver.find_element(By.NAME, "userid")
     login.send_keys(os.getenv('TYRE24_LOG'))
     time.sleep(1)
+
     password = driver.find_element(By.NAME, "password")
     password.send_keys(os.getenv('TRYE24_PASS'))
     time.sleep(1)
+
     password.send_keys(Keys.ENTER)
     time.sleep(10)
 
 
 def cliquer_sur_pneus_charge(driver, article):
+    """
+    fonction qui rajout l'indice de charge pour la recherche
+
+    """
     if article == 10:
         xpath_saison = f'//span[contains(text(), "{article[8:10]}")]'
     else:
@@ -59,6 +72,9 @@ def cliquer_sur_pneus_charge(driver, article):
 
 
 def cliquer_sur_pneus_selon_saison(driver, saison_texte):
+    """
+    fonction qui sert a selectionné les champs de saison
+    """
     xpath_saison = f'//span[contains(text(), "Pneus {saison_texte}")]'
 
     try:
@@ -72,6 +88,9 @@ def cliquer_sur_pneus_selon_saison(driver, saison_texte):
 
 
 def select_saisons(driver, saisons):
+    """
+    fonction qui valide les champs de saison selon les saison du tableau saison
+    """
     if "été" in saisons:
         cliquer_sur_pneus_selon_saison(driver, "été")
 
@@ -84,6 +103,9 @@ def select_saisons(driver, saisons):
 
 
 def extract_article_info(article, driver, liste_article):
+    """
+    fonction qui extrait les info de chaque article et les retourne sous forme de dictionnaire
+    """
     try:
 
         profil = article.find_element(
@@ -125,6 +147,10 @@ def extract_article_info(article, driver, liste_article):
 
 
 def save_donnees_sql(data, marques):
+    """
+    fonction de sauvegarde des données en SQL
+    """
+
     HOST = os.getenv('HOST')
     PORT = os.getenv('PORT')
     ID = os.getenv('ID')
@@ -149,8 +175,11 @@ def save_donnees_sql(data, marques):
 
 
 def scrap_tyre24(liste_articles, saisons, marques):
-    driver = webdriver.Firefox('')
+    """
+    fonction principal pour le scrap
+    """
 
+    driver = webdriver.Firefox('')
     driver.get(
         "https://tyre24.alzura.com/fr/fr")
     time.sleep(2)

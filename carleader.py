@@ -1,7 +1,7 @@
 import os
 import time
-import pandas as pd
 import psycopg2
+import pandas as pd
 from datetime import datetime
 from selenium import webdriver
 from dotenv import load_dotenv
@@ -24,6 +24,9 @@ load_dotenv()
 
 
 def select_saison(driver, saison):
+    """
+    fonction de selection de saison
+    """
     saison_ete = driver.find_element(By.ID, "customCheck2")
     if 'été' in saison:
         if saison_ete.is_selected():
@@ -66,6 +69,9 @@ def select_saison(driver, saison):
 
 
 def login(driver):
+    """
+    fonction de login du site
+    """
     login = driver.find_element(By.ID, "login_form_customer_code")
     login.send_keys(os.getenv("CARLEADER_LOG"))
     time.sleep(2)
@@ -77,8 +83,10 @@ def login(driver):
 
 
 def search_article(driver, marque, article):
+    """
+    fonction de recherche d'article
+    """
     try:
-
         time.sleep(1)
         search_article = driver.find_element(By.ID, "validationServer01")
         driver.execute_script("arguments[0].value = '';", search_article)

@@ -1,14 +1,14 @@
 import os
 import time
 import pandas as pd
+from datetime import datetime
+from selenium import webdriver
 from dotenv import load_dotenv
 from openpyxl import load_workbook
 from sqlalchemy import create_engine
-from datetime import datetime
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')

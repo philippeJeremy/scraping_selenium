@@ -12,9 +12,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
 
-dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
-liste_articles = dimension['Dimension'].to_list()
-# liste_articles = ['2055516V91']
+# dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
+# liste_articles = dimension['Dimension'].to_list()
+liste_articles = ['2055516V91']
 
 saisons = ["été", "4 saisons"]
 
@@ -132,12 +132,12 @@ def scrap_centralepneus(liste_articles, saisons, marques):
     # connexion au site web
     driver = webdriver.Firefox('')
     driver.get("https://www.centralepneus.fr/")
-    time.sleep(2)
+    time.sleep(5)
 
     data = []
 
     driver.find_element(By.XPATH, '/html/body/div[8]/div[1]/a').click()
-    time.sleep(2)
+    time.sleep(5)
 
     select_marque(driver, marques)
 

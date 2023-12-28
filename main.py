@@ -15,7 +15,7 @@ from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
 
-liste_articles = ["2055516V91"]
+liste_articles = ["2055516V91", "2156516V102"]
 
 saisons_disti = ["été", "hiver", "4 saisons"]
 saisons = ["été", "4 saisons"]
@@ -52,7 +52,7 @@ except Exception as ex:
     print(error_message)
     send_email("Erreur scrap web", error_message)
 try:
-    districash_scrap(liste_articles, saisons_disti)
+    districash_scrap(liste_articles, saisons_disti, marques)
     time.sleep(20)
 except Exception as ex:
     error_message = str(ex)

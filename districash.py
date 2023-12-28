@@ -14,7 +14,7 @@ from selenium.webdriver.support.select import Select
 # liste_articles = dimension['Dimension'].to_list()
 liste_articles = ['2055516V91']
 
-
+saisons_disti = ["été", "hiver", "4 saisons"]
 # marques = ["MICH", "CONT", "BRID",  'DUNL',  'GOAR', 'TOUR',
 #            'KLEB', 'FIRE', 'VRED', "HANK", 'UNIR', 'KORM']
 
@@ -105,12 +105,13 @@ def extract_article_info(article, driver, liste_article):
         prix = article.find_element(By.XPATH, 'td[16]/span/b')
         saison = article.find_element(
             By.XPATH, 'td[29]/b/img').get_attribute('title')
+        design = designation.text.split(' ', 2)
 
         article_info = {
             'Code': code.text[0:8] + valeur_ind_C,
             'Marque': marque.capitalize(),
-            'Code article': designation.text.replace(" ", "").replace("-", "").replace("/", "").replace(".", ""),
-            'Designation': designation.text,
+            'Code article': design[2].replace(" ", "").replace("-", "").replace("/", "").replace(".", ""),
+            'Designation': design[2],
             'Prix': prix.text,
             'Saison': saison,
             'Date': date_du_jour,
@@ -176,28 +177,23 @@ def save_donnees_sql(data, marques):
     DATABASE = os.getenv('DATABASE')
     PASSWORD = os.getenv('PASSWORD')
 
-    data = [item for item in data if item is not None]
+    # data = [item for item in data if item is not None]
 
     df = pd.DataFrame(data)
     df.replace("", pd.NA, inplace=True)
     df.dropna(inplace=True)
+    df = df[df['Marque'].isin(marques)]
     df = df[df['Saison'] != 'hiver']
     df.replace("été / hiver", '4 Saisons', inplace=True)
     df.replace("été", 'Eté', inplace=True)
 
-    data_final = pd.DataFrame()
-
-    for i in marques:
-        data_clean = df[df['Marque'] == i]
-        data_final = pd.concat([data_final, data_clean])
-
     connection_string = f"postgresql+psycopg2://{ID}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
     engine = create_engine(connection_string)
 
-    data_final.to_sql('scrap_pneu', engine, if_exists='append', index=False)
+    df.to_sql('scrap_pneu', engine, if_exists='append', index=False)
 
 
-def districash_scrap(liste_articles, marques):
+def districash_scrap(liste_articles, saisons, marques):
     # connexion au site
     with webdriver.Firefox('') as driver:
         driver.get(
@@ -242,4 +238,4 @@ def districash_scrap(liste_articles, marques):
 
 
 if __name__ == "__main__":
-    districash_scrap(liste_articles, marques)
+    districash_scrap(liste_articles, saisons_disti, marques)

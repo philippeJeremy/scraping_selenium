@@ -11,10 +11,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
-
+load_dotenv()
 # dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
 # liste_articles = dimension['Dimension'].to_list()
-liste_articles = ['2055516V91']
+liste_articles = ['1956515H91']
 
 saisons = ["été", "4 saisons"]
 
@@ -37,6 +37,7 @@ def save_donnees_sql(data):
     df = pd.DataFrame(data)
     df.replace("", pd.NA, inplace=True)
     df.dropna(inplace=True)
+    df = df[df['Saison'] != 'hiver']
 
     df.to_sql('scrap_pneu', engine, if_exists='append', index=False)
 
@@ -108,12 +109,13 @@ def extract_article(driver, artilce, liste_article):
     designation = artilce.find_element(By.XPATH, 'td[3]/a/span[2]')
     prix = artilce.find_element(By.XPATH, 'td[6]/div/span[1]')
     saison = artilce.find_element(By.XPATH, 'td[5]')
+    code_article = code_clean.replace(
+        '/', '').replace(' ', '') + designation.text.replace(' ', '')
 
     article_info = {
         'Code': code_clean,
         'Marque': marque.text,
-        'Code article': clean_code[0].replace('/', '').replace(' ', '') + designation.text.replace(' ', ''),
-        'Designation': clean_code[0] + ' ' + marque.text + ' ' + designation.text,
+        'Code article': code_article.upper(),
         'Prix': prix.text.replace(',', '.').replace('€', ''),
         'Saison': saison.text.replace('Tourisme ', ''),
         'Date': date_du_jour,

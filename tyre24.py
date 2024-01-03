@@ -10,9 +10,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 # lecture d'un fichier excel et mise des donées en tableau
-dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
-liste_articles = dimension['Dimension'].to_list()
-# liste_articles = ["2055516V91"]
+# dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
+# liste_articles = dimension['Dimension'].to_list()
+liste_articles = ["2056516T107"]
 
 saisons = ["été", "4 saisons"]
 
@@ -107,29 +107,43 @@ def extract_article_info(article, driver, liste_article):
     fonction qui extrait les info de chaque article et les retourne sous forme de dictionnaire
     """
     try:
-
         profil = article.find_element(
             By.XPATH, "div[4]/div[2]/p[2]")
+
         profil_no_M = profil.text.split(' ', 1)
         pattern = re.compile(
             f"{re.escape(liste_article[0:3])}(.*?){re.escape(liste_article[7:8])}", re.DOTALL)
         resultat = pattern.search(profil.text)
         texte_extrait = resultat.group(1).replace(
-            '/', '').replace('R', '').replace(' ', '')
+            '/', '').replace(' ', '')
+        dim_L = profil_no_M[1]
+        dim = dim_L.split(' ', 1)
+        dim_T = dim[1]
         date_du_jour = datetime.now().strftime("%d-%m-%Y")
         complement = article.find_element(
             By.XPATH, 'div[4]/div[2]/p[1]')
-        designation = profil_no_M[1].split(' ', 1)
         prix = article.find_element(
             By.XPATH, 'div[5]/div[2]/div/div/span')
         saison = article.find_element(
             By.XPATH, 'div[4]/div[2]/div')
         saison_clean = saison.text.split(' ', 1)
+        indice = profil_no_M[1]
+
+        if len(liste_article) == 10:
+            code = dim_T[0:3] + texte_extrait[0:5].replace(
+                'R', '') + indice[-1] + texte_extrait[5:7]
+            code_article = dim_T[0:3] + texte_extrait[0:5] + indice[-1] + texte_extrait[5:7] + \
+                complement.text.replace(' ', '').replace('.', '')
+        else:
+            code = dim_T[0:3] + texte_extrait[0:5].replace(
+                'R', '') + indice[-1] + texte_extrait[5:8]
+            code_article = dim_T[0:3] + texte_extrait[0:5] + indice[-1] + texte_extrait[5:8] + \
+                complement.text.replace(' ', '').replace('.', '')
         article_info = {
-            'Code': liste_article[0:3] + texte_extrait[0:4] + liste_article[7:8] + texte_extrait[4:],
+
+            'Code': code,
             'Marque': profil_no_M[0].capitalize(),
-            'Code article': liste_article[0:3] + texte_extrait[0:4] + 'TL' + liste_article[7:8] + texte_extrait[4:] + complement.text.replace(' ', ''),
-            'Designation': designation[1] + ' ' + complement.text.replace(' ', ''),
+            'Code article': code_article.upper(),
             'Prix': prix.text.replace('€', '').replace(',', '.'),
             'Saison': saison_clean[1],
             'Date': date_du_jour,

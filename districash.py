@@ -12,7 +12,7 @@ from selenium.webdriver.support.select import Select
 
 # dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
 # liste_articles = dimension['Dimension'].to_list()
-liste_articles = ['2055516V91']
+liste_articles = ['2056516T107']
 
 saisons_disti = ["été", "hiver", "4 saisons"]
 # marques = ["MICH", "CONT", "BRID",  'DUNL',  'GOAR', 'TOUR',
@@ -105,13 +105,25 @@ def extract_article_info(article, driver, liste_article):
         prix = article.find_element(By.XPATH, 'td[16]/span/b')
         saison = article.find_element(
             By.XPATH, 'td[29]/b/img').get_attribute('title')
-        design = designation.text.split(' ', 2)
+        design = designation.text.split(' ')
+        digits = ''
+        letters = ''
+        last = ''
+        for char in design[3]:
+            if char.isdigit():
+                digits += char
+            elif char.isalpha():
+                letters += char
+
+        for i in design[4:]:
+            last += i
+        num = design[2]
+        code_article = num[0:9].replace('/', '') + letters + digits + last
 
         article_info = {
             'Code': code.text[0:8] + valeur_ind_C,
             'Marque': marque.capitalize(),
-            'Code article': design[2].replace(" ", "").replace("-", "").replace("/", "").replace(".", ""),
-            'Designation': design[2],
+            'Code article': code_article,
             'Prix': prix.text,
             'Saison': saison,
             'Date': date_du_jour,
@@ -180,8 +192,9 @@ def save_donnees_sql(data, marques):
     # data = [item for item in data if item is not None]
 
     df = pd.DataFrame(data)
-    df.replace("", pd.NA, inplace=True)
-    df.dropna(inplace=True)
+    # df.replace("", pd.NA, inplace=True)
+    # df.dropna(inplace=True)
+    # print(df.head(5))
     df = df[df['Marque'].isin(marques)]
     df = df[df['Saison'] != 'hiver']
     df.replace("été / hiver", '4 Saisons', inplace=True)

@@ -65,16 +65,15 @@ def extract_article_info(article, driver, liste_article):
             By.XPATH, 'div[1]/div/div[2]/div/div[2]')
         profil = article.find_element(
             By.XPATH, "div[2]/div/div[2]/span/b")
-        code = dim.text.replace('/', '').replace('R', '')
+        code = dim.text.replace('/', '')
         ind_split = indice.text.split()
         indice_V = ind_split[1]
         indice_C = ind_split[0]
 
         article_info = {
-            'Code': code.replace(' ', '') + indice_V + indice_C,
+            'Code': code.replace(' ', '').replace('R', '') + indice_V + indice_C,
             'Marque': marque.text.capitalize(),
-            'Code article': code.replace(' ', '') + 'TL' + indice_V + indice_C + profil.text.replace(' ', ""),
-            'Designation': dim.text + 'TL' + indice_V + indice_C + profil.text,
+            'Code article': code.replace(' ', '') + indice_V + indice_C + profil.text.replace(' ', ""),
             'Prix': prix.text.replace('€', '').replace(',', '.'),
             'Saison': saison.text.replace('VL', '').replace(' ', ''),
             'Date': date_du_jour,
@@ -154,6 +153,9 @@ def save_donnees_sql(data):
     data = [item for item in data if item is not None]
 
     df = pd.DataFrame(data)
+    condition = df['Saison'].str.contains(
+        'CAMIONNETTEÉTÉ|4X4ÉTÉ|CAMIONNETTE4SAISONS|4X44SAISONS')
+    df = df.drop(df[condition].index)
     df.replace('ÉTÉ', 'Eté', inplace=True)
     df.replace('4SAISONS', '4 Saisons', inplace=True)
 

@@ -11,9 +11,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
-dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
-liste_articles = dimension['Dimension'].to_list()
-# liste_articles = ['2055516V91']
+# dimension = pd.read_excel('Copie de Ranking.xlsx', sheet_name='Feuil1')
+# liste_articles = dimension['Dimension'].to_list()
+liste_articles = ['1956515H91', '2056516T107']
 
 saisons = ["été", "4 saisons"]
 
@@ -123,23 +123,27 @@ def extract_article_info(driver, article, liste_article):
     text_code = code.text.replace("/", "").replace("-", "").replace(" ", "")
     marque = article.find_element(
         By.XPATH, 'div/div/div[1]/div/div[2]/div/div[1]/p/strong')
-    designation = article.find_element(
-        By.XPATH, 'div/div/div[1]/div/div[2]/div/div[1]/span')
     prix = article.find_element(
         By.XPATH, 'div[1]/div/div[4]/div/div[2]/div/div[2]/span[2]')
     saison = article.find_element(
         By.XPATH, 'div[2]/div/div/div[2]/div/div/ul/li[3]')
     saison_tab = saison.text.split()
+    designation = article.find_element(
+        By.XPATH, 'div/div/div[1]/div/div[2]/div/div[1]/p')
+    design = designation.text.split(' ', 1)
+    text_article = code.text.replace(
+        "/", "").replace("-", "R").replace(" ", "")
     if saison_tab[-2] == '4':
         texte_saison = saison_tab[-2] + ' ' + saison_tab[-1]
     else:
         texte_saison = saison_tab[-1]
+    code_article = text_article[0:8] + tab_v[-1] + \
+        tab_c[-1] + design[1].replace(' ', '')
 
     article_info = {
         'Code': text_code[0:7] + tab_v[-1] + tab_c[-1],
         'Marque': marque.text.replace(' ', ''),
-        'Code article': designation.text.replace(" ", "").replace("-", "").replace("/", "").replace(".", ""),
-        'Designation': designation.text,
+        'Code article': code_article.upper(),
         'Prix': prix.text.replace('€', ''),
         'Saison': texte_saison,
         'Date': date_du_jour,
